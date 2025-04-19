@@ -7,12 +7,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Face Detection API"
     
     # Face Detection Settings
-    FACE_DETECTION_MODEL: str = "VGG-Face"
-    FACE_DETECTION_BACKEND: str = "opencv"
-    FACE_DETECTION_METRIC: str = "cosine"
-    
-    # Analysis Settings
-    FACE_ANALYSIS_ACTIONS: list = ["age", "gender", "emotion"]
+    FACE_DETECTION_THRESHOLD: float = 0.6
     
     # File Settings
     UPLOAD_DIR: str = "uploads"
