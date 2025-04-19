@@ -3,7 +3,7 @@ services:
     name: face-detection-api
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT --workers 4 --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
