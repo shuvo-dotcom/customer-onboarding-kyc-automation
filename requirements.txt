@@ -7,10 +7,10 @@ pydantic==2.4.2
 # Face Detection and Analysis
 opencv-python==4.8.1.78
 deepface==0.0.79
-numpy==1.26.4
+numpy==1.24.3  # Compatible with TensorFlow 2.13.0
 Pillow==10.4.0
-tensorflow==2.13.0  # Specific version compatible with DeepFace
-keras==2.13.1  # Matching Keras version
+tensorflow==2.13.0
+keras==2.13.1
 
 # Testing
 pytest==7.4.3
