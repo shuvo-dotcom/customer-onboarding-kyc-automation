@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: face-detection-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FACE_DETECTION_MODEL
+        value: VGG-Face
+      - key: FACE_DETECTION_BACKEND
+        value: opencv
+      - key: FACE_DETECTION_METRIC
+        value: cosine
+      - key: FACE_ANALYSIS_ACTIONS
+        value: '["age", "gender", "emotion"]' 

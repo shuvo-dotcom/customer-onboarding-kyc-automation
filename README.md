@@ -1,40 +1,32 @@
-# KYC Automation Agent
+# Face Detection API
 
-A comprehensive Know Your Customer (KYC) automation system that handles document processing, facial recognition, and compliance checks.
+A FastAPI-based face detection and verification system that provides endpoints for:
+- Face detection with analysis (age, gender, emotion)
+- Face verification between two images
 
 ## Features
 
-- 📄 **OCR & Text Extraction**: Convert scanned documents to machine-readable text using Amazon Textract and Tesseract OCR
-- 🗂️ **Document Classification**: ML-powered document type classification
-- 👤 **Facial Recognition**: Match selfies with ID document photos
-- 🕵️‍♂️ **Sanctions & PEP Checks**: Integration with compliance databases
-- 🔄 **Workflow Automation**: Orchestrated processing pipeline
-- 📢 **Notification System**: Automated customer communications
-- 🧑‍💻 **Review Interface**: Web-based dashboard for compliance officers
-- 🔁 **Continuous Learning**: Feedback loop for system improvement
+- Face detection and analysis
+- Face verification
+- Real-time processing
+- RESTful API endpoints
+- CORS support
+- Comprehensive test suite
+- Configurable settings
 
 ## Project Structure
 
 ```
-kyc_automation/
-├── app/
-│   ├── api/           # FastAPI routes and endpoints
-│   ├── core/          # Core configuration and settings
-│   ├── models/        # Database models
-│   ├── schemas/       # Pydantic models
-│   ├── services/      # Business logic
-│   │   ├── ocr/       # OCR processing
-│   │   ├── ml/        # Machine learning models
-│   │   ├── facial/    # Facial recognition
-│   │   ├── compliance/# Compliance checks
-│   │   └── notification/ # Notification system
-│   └── utils/         # Utility functions
-├── tests/             # Test suite
-├── alembic/           # Database migrations
-└── scripts/           # Utility scripts
+face_detection/
+├── api/           # API endpoints
+├── core/          # Core configuration
+├── models/        # Data models
+└── utils/         # Utility functions
+tests/             # Test suite
+test_images/       # Test images
 ```
 
-## Setup
+## Installation
 
 1. Create a virtual environment:
 ```bash
@@ -47,46 +39,75 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+## Running the API Locally
+
+Start the FastAPI server:
 ```bash
-cp .env.example .env
-# Edit .env with your configuration
+uvicorn face_detection.api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-4. Initialize the database:
-```bash
-alembic upgrade head
-```
+The API will be available at:
+- Main endpoint: http://localhost:8000
+- API documentation: http://localhost:8000/docs
+- API v1 documentation: http://localhost:8000/api/v1/docs
 
-5. Start the application:
-```bash
-uvicorn app.main:app --reload
-```
+## Deployment to Render
 
-## Configuration
+1. Create a Render account at https://render.com
 
-The system requires the following environment variables:
+2. Create a new Web Service:
+   - Connect your GitHub repository
+   - Select the branch to deploy
+   - Set the following configuration:
+     - Environment: Python
+     - Build Command: `pip install -r requirements.txt`
+     - Start Command: `uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT`
 
-- `AWS_ACCESS_KEY_ID`: AWS credentials for Textract
-- `AWS_SECRET_ACCESS_KEY`: AWS credentials for Textract
-- `COMPLYADVANTAGE_API_KEY`: API key for compliance checks
-- `TWILIO_ACCOUNT_SID`: Twilio credentials for SMS
-- `TWILIO_AUTH_TOKEN`: Twilio credentials for SMS
-- `SENDGRID_API_KEY`: SendGrid API key for emails
-- `DATABASE_URL`: PostgreSQL connection string
+3. Environment Variables:
+   - `PYTHON_VERSION`: 3.11.0
+   - `FACE_DETECTION_MODEL`: VGG-Face
+   - `FACE_DETECTION_BACKEND`: opencv
+   - `FACE_DETECTION_METRIC`: cosine
+   - `FACE_ANALYSIS_ACTIONS`: ["age", "gender", "emotion"]
 
-## API Documentation
+4. Click "Create Web Service"
 
-Once the application is running, visit:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+The API will be automatically deployed and available at your Render URL.
+
+## API Endpoints
+
+### 1. Detect Face
+- **Endpoint**: `/api/v1/detect-face`
+- **Method**: POST
+- **Input**: Image file
+- **Output**: Face analysis (age, gender, emotion)
+
+### 2. Verify Faces
+- **Endpoint**: `/api/v1/verify-faces`
+- **Method**: POST
+- **Input**: Two image files
+- **Output**: Verification result with confidence score
 
 ## Testing
 
 Run the test suite:
 ```bash
-pytest
+pytest tests/
 ```
+
+Make sure to place test images in the `test_images` directory:
+- `face.jpg` for face detection
+- `no_face.jpg` for testing no face detection
+- `face1.jpg` and `face2.jpg` for face verification
+
+## Configuration
+
+The API can be configured through environment variables or by modifying `face_detection/core/config.py`:
+
+- `FACE_DETECTION_MODEL`: Model used for face detection (default: "VGG-Face")
+- `FACE_DETECTION_BACKEND`: Backend used for face detection (default: "opencv")
+- `FACE_DETECTION_METRIC`: Distance metric for face verification (default: "cosine")
+- `FACE_ANALYSIS_ACTIONS`: List of analysis actions (default: ["age", "gender", "emotion"])
 
 ## Contributing
 
@@ -98,4 +119,4 @@ pytest
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License. 
