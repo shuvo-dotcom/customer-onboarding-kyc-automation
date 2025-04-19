@@ -58,17 +58,17 @@ The API will be available at:
 2. Create a new Web Service:
    - Connect your GitHub repository
    - Select the branch to deploy
-   - Set the following configuration:
-     - Environment: Python
-     - Build Command: `pip install -r requirements.txt`
-     - Start Command: `uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT`
+   - The configuration will be automatically picked up from your `render.yaml` file
 
-3. Environment Variables:
+3. Environment Variables (already configured in render.yaml):
    - `PYTHON_VERSION`: 3.11.0
    - `FACE_DETECTION_MODEL`: VGG-Face
    - `FACE_DETECTION_BACKEND`: opencv
    - `FACE_DETECTION_METRIC`: cosine
    - `FACE_ANALYSIS_ACTIONS`: ["age", "gender", "emotion"]
+   - `TF_CPP_MIN_LOG_LEVEL`: 2
+   - `TF_ENABLE_ONEDNN_OPTS`: 1
+   - `TF_XLA_FLAGS`: --tf_xla_enable_xla_devices
 
 4. Click "Create Web Service"
 

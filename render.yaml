@@ -3,7 +3,7 @@ services:
     name: face-detection-api
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn face_detection.api.main:app --host 0.0.0.0 --port $PORT --workers 4 --timeout 120
+    startCommand: uvicorn face_detection.api.main:app --host 0.0.0.0
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -14,4 +14,14 @@ services:
       - key: FACE_DETECTION_METRIC
         value: cosine
       - key: FACE_ANALYSIS_ACTIONS
-        value: '["age", "gender", "emotion"]' 
+        value: '["age", "gender", "emotion"]'
+      - key: TF_CPP_MIN_LOG_LEVEL
+        value: '2'  # Suppress TensorFlow warnings
+      - key: TF_ENABLE_ONEDNN_OPTS
+        value: '1'  # Enable oneDNN optimizations
+      - key: TF_XLA_FLAGS
+        value: '--tf_xla_enable_xla_devices'  # Enable XLA optimizations
+      - key: TF_FORCE_GPU_ALLOW_GROWTH
+        value: 'true'
+      - key: KERAS_BACKEND
+        value: 'tensorflow' 
