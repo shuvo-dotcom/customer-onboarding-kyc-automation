@@ -1,30 +1,17 @@
 # Face Detection API
 
-A FastAPI-based face detection and verification system that provides endpoints for:
-- Face detection with analysis (age, gender, emotion)
-- Face verification between two images
+A FastAPI-based face detection and analysis service that can be easily integrated into other projects.
 
 ## Features
 
-- Face detection and analysis
-- Face verification
-- Real-time processing
+- Face detection in images
+- Real-time processing (user uploads, camera input)
 - RESTful API endpoints
 - CORS support
-- Comprehensive test suite
-- Configurable settings
-
-## Project Structure
-
-```
-face_detection/
-├── api/           # API endpoints
-├── core/          # Core configuration
-├── models/        # Data models
-└── utils/         # Utility functions
-tests/             # Test suite
-test_images/       # Test images
-```
+- Easy integration with other projects
+- Hand/finger extraction
+- Document upload for KYC
+- Selfie upload for face verification
 
 ## Installation
 
@@ -39,84 +26,113 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Running the API Locally
+## Usage
 
-Start the FastAPI server:
-```bash
-uvicorn face_detection.api.main:app --reload --host 0.0.0.0 --port 8000
+### As a Package
+
+You can use the face, hand, and document detection functionality in your own Python projects:
+
+```python
+from face_detection.core import FaceDetector
+
+# Initialize the detector
+detector = FaceDetector()
+
+# Process an image
+with open("image.jpg", "rb") as f:
+    image_data = f.read()
+    result = detector.process_image(image_data)
+    print(f"Found {result['faces_detected']} faces")
 ```
 
-The API will be available at:
-- Main endpoint: http://localhost:8000
-- API documentation: http://localhost:8000/docs
-- API v1 documentation: http://localhost:8000/api/v1/docs
+### As an API (Real-Time & Batch Processing)
 
-## Deployment to Render
+1. Start the API server:
+```bash
+python -m face_detection.api
+```
 
-1. Create a Render account at https://render.com
+2. The API will be available at `http://localhost:8000`
 
-2. Create a new Web Service:
-   - Connect your GitHub repository
-   - Select the branch to deploy
-   - The configuration will be automatically picked up from your `render.yaml` file
+3. API Endpoints:
+- `POST /detect-faces`: Upload an image for face detection
+- `POST /api/v1/fingerprint/extract-fingers`: Upload a hand image for finger extraction (returns number of fingers, finger crops, and contour image)
+- `POST /api/v1/kyc/upload-document`: Upload an ID/passport document for KYC session
+- `POST /api/v1/kyc/upload-selfie`: Upload a selfie for face verification
+- `GET /test`: Test endpoint that creates and processes a test face pattern
+- `GET /`: Root endpoint to check if the API is running
 
-3. Environment Variables (already configured in render.yaml):
-   - `PYTHON_VERSION`: 3.11.0
-   - `FACE_DETECTION_MODEL`: VGG-Face
-   - `FACE_DETECTION_BACKEND`: opencv
-   - `FACE_DETECTION_METRIC`: cosine
-   - `FACE_ANALYSIS_ACTIONS`: ["age", "gender", "emotion"]
-   - `TF_CPP_MIN_LOG_LEVEL`: 2
-   - `TF_ENABLE_ONEDNN_OPTS`: 1
-   - `TF_XLA_FLAGS`: --tf_xla_enable_xla_devices
+4. Example API usage (face detection and hand/finger extraction):
+```python
+import requests
 
-4. Click "Create Web Service"
+# Test endpoint
+response = requests.get("http://localhost:8000/test")
+print(response.json())
 
-The API will be automatically deployed and available at your Render URL.
+# Detect faces in an image
+with open("image.jpg", "rb") as f:
+    files = {"file": f}
+    response = requests.post("http://localhost:8000/detect-faces", files=files)
+    print(response.json())
 
-## API Endpoints
+# Extract fingers from a hand image
+with open("hand.jpg", "rb") as f:
+    files = {"image": ("hand.jpg", f, "image/jpeg")}
+    response = requests.post("http://localhost:8000/api/v1/fingerprint/extract-fingers", files=files)
+    print(response.json())
+```
 
-### 1. Detect Face
-- **Endpoint**: `/api/v1/detect-face`
-- **Method**: POST
-- **Input**: Image file
-- **Output**: Face analysis (age, gender, emotion)
+### Batch Processing with Public Datasets
 
-### 2. Verify Faces
-- **Endpoint**: `/api/v1/verify-faces`
-- **Method**: POST
-- **Input**: Two image files
-- **Output**: Verification result with confidence score
+You can benchmark or test the system using public datasets such as [11K Hands](https://sites.google.com/view/11khands/) for hand/finger extraction, [MIDV-500](https://github.com/fal-ko/MIDV-500) for ID documents, or [VGGFace2](https://www.robots.ox.ac.uk/~vgg/data/vgg_face2/) for face verification.
 
-## Testing
+A batch processing script (`batch_finger_extraction.py`) is provided to run extraction over all images in a dataset folder:
 
-Run the test suite:
+```bash
+python batch_finger_extraction.py
+```
+
+Update the `DATASET_DIR` variable in the script to point to your dataset images.
+
+## API Response Format
+
+The API returns JSON responses with the following structure (example for face detection):
+
+```json
+{
+    "faces_detected": 1,
+    "face_locations": [[x, y, width, height]],
+    "processed_image": "base64_encoded_image"
+}
+```
+
+For hand/finger extraction:
+```json
+{
+    "num_fingers": 5,
+    "fingers": ["base64_encoded_finger1", ...],
+    "finger_lines": ["base64_encoded_edges1", ...],
+    "contour_img": "base64_encoded_hand_contour"
+}
+```
+
+## Real-Time Processing Note
+
+> This system is designed for real-time, user-driven biometric verification. All processing is performed live on user-uploaded images or camera captures, simulating real-world onboarding scenarios. However, the API and batch scripts can also be used for benchmarking with public datasets.
+
+## Development
+
+1. Install development dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Run tests:
 ```bash
 pytest tests/
 ```
 
-Make sure to place test images in the `test_images` directory:
-- `face.jpg` for face detection
-- `no_face.jpg` for testing no face detection
-- `face1.jpg` and `face2.jpg` for face verification
-
-## Configuration
-
-The API can be configured through environment variables or by modifying `face_detection/core/config.py`:
-
-- `FACE_DETECTION_MODEL`: Model used for face detection (default: "VGG-Face")
-- `FACE_DETECTION_BACKEND`: Backend used for face detection (default: "opencv")
-- `FACE_DETECTION_METRIC`: Distance metric for face verification (default: "cosine")
-- `FACE_ANALYSIS_ACTIONS`: List of analysis actions (default: ["age", "gender", "emotion"])
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
 ## License
 
-This project is licensed under the MIT License. 
+MIT License 

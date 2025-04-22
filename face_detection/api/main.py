@@ -7,6 +7,8 @@ import tempfile
 import os
 from typing import Dict
 from ..core.config import settings
+from .kyc import router as kyc_router
+from .fingerprint import router as fingerprint_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -143,6 +145,9 @@ async def verify_faces(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+app.include_router(kyc_router, prefix="/api/v1")
+app.include_router(fingerprint_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

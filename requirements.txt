@@ -2,19 +2,22 @@
 fastapi==0.109.2
 uvicorn==0.24.0
 python-multipart==0.0.6
-pydantic==2.6.1
-pydantic-settings==2.1.0
+pydantic
+pydantic-settings
 
 # Face Detection and Analysis
-opencv-python==4.8.1.78
-dlib==19.24.2
-face-recognition==1.3.0
-numpy==1.24.3
-Pillow==10.4.0
+opencv-python==4.9.0.80
+numpy>=1.26.0
+dlib>=19.24.2
+face-recognition>=1.3.0
+Pillow>=10.0.0
+pytesseract==0.3.10
+deepface
 
 # Testing
 pytest==7.4.3
 requests==2.31.0
 
-# Frontend
-streamlit==1.31.1 
+# Development
+python-dotenv==1.0.0
+streamlit==1.31.1
